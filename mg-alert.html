@@ -1,0 +1,29 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="mg-alert">
+	<template>
+		<style>
+			#alert-box {
+				display: none;
+			}
+		</style>
+		<div id="alert-box">
+		</div>
+	</template>
+	<script>
+		Polymer({
+			is: 'mg-alert',
+
+			properties: {
+				
+			},
+
+			alert: function(content) {
+				var alertBox = this.$['alert-box'];
+				alertBox.appendChild(content);
+				alertBox.style.display = 'block';
+			}
+
+		})
+	</script>
+</dom-module>
