@@ -1,21 +1,13 @@
 {
   "name": "mg-alert",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/possible819/mg-alert",
-  "authors": [
-    "Jay Lee <jaylee.possible@gmail.com>"
-  ],
+  "authors": ["Jay Lee <jaylee.possible@gmail.com>"],
   "description": "polymer mg-alert component",
   "main": "mg-alert.html",
   "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
-   "dependencies": {
+  "ignore": ["**/.*", "node_modules", "bower_components", "test", "tests"],
+  "dependencies": {
     "polymer": "polymer/polymer#^1.9.2"
   }
 }
