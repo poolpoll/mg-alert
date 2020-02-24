@@ -3,11 +3,58 @@
 <dom-module id="mg-alert">
 	<template>
 		<style>
-			#alert-box {
+			#modal {
 				display: none;
+				position: absolute;
+				z-index: 10;
+				height: 100vh;
+				width: 100vw;
+				background: rgba(0, 0, 0, 0.7);	
+			}
+			#alert-box {
+				position: absolute;
+				display: none;
+				z-index: 100;
+				background-color: #FFFFFF;
+				top: 0; right: 0; bottom: 0; left: 0;
+				margin: auto;
+				border-radius: 5px;
+				flex-direction: column;
+			}
+			.content-wrapper {
+				display: flex;
+				flex-direction: column;
+				flex: auto;
+				padding: 5%;
+			}
+			.btn-bar {
+				border-bottom-right-radius: 5px;
+				border-bottom-left-radius: 5px;
+				display: flex;
+				flex-direction: row;
+				margin: auto;
+				background: linear-gradient( to bottom, #3BB5A3, #00A2D9 );
+				width: 100%;
+			}
+			.button {
+				flex: 1;
+			}
+			img {
+				display: block;
+				height: 3vh;
+				margin: auto;
+				padding: 1vh;
 			}
 		</style>
-		<div id="alert-box">
+		<div id="modal">
+			<div id="alert-box">
+				<div class="content-wrapper"></div>
+
+				<div class="btn-bar">
+					<div id="left-btn" class="button" on-tap="cancelBtnTapped" use-both="[[useBothBtn]]" hidden="[[!useCancelButton]]"><img src="./images/cancel_btn.png" /></div>
+					<div id="right-btn" class="button" on-tap="confirmBtnTapped" hidden="[[!useConfirmButton]]"><img src="./images/confirm_btn.png" /></div>
+				</div>
+			</div>
 		</div>
 	</template>
 	<script>
@@ -15,15 +62,106 @@
 			is: 'mg-alert',
 
 			properties: {
-				
+				useCancelButton: {
+					type: Boolean,
+					value: false
+				},
+
+				useConfirmButton: {
+					type: Boolean,
+					value: false
+				},
+
+				boxSize: {
+					type: String,
+					value: 'normal-size'
+				},
+
+				defaultWidth: {
+					type: String,
+					value: '50%'
+				},
+
+				defaultHeight: {
+					type: String,
+					value: '17%'
+				}
 			},
 
-			alert: function(content) {
-				var alertBox = this.$['alert-box'];
-				alertBox.appendChild(content);
-				alertBox.style.display = 'block';
-			}
+			observers: [
+				'_buttonUsageChanged(useConfirmButton, useCancelButton)'
+			],
 
+			ready: function() {
+				window.mgAlert = this.mgAlert;
+			},
+
+			mgAlert: function(config) {
+				var me = document.querySelector('mg-alert');
+
+				var mgAlert = document.querySelector('mg-alert');
+				var contentWrapper = mgAlert.querySelector('.content-wrapper');
+				config.content.setAttribute('id', 'content');
+				config.content.style.margin = 'auto';
+				contentWrapper.appendChild(config.content);
+				mgAlert.useCancelButton = config.useCancelButton ? config.useCancelButton : me.useCancelButton;
+				mgAlert.useConfirmButton = config.useConfirmButton ? config.useConfirmButton : me.useConfirmButton;
+
+				var alertBox = mgAlert.querySelector('#alert-box');
+				var modal = mgAlert.querySelector('#modal');
+
+				mgAlert.confirmCallback = config.confirmCallback;
+				mgAlert.cancelCallback = config.cancelCallback;
+
+				alertBox.style.display = 'flex';
+				alertBox.style.width = config.width ? config.width : me.defaultWidth;
+				alertBox.style.height = config.height ? config.height : me.defaultHeight;
+				modal.style.display = 'flex';
+			},
+
+			_buttonUsageChanged: function(useConfirmButton, useCancelButton) {
+				if(useConfirmButton && useConfirmButton) {
+					this.$['left-btn'].style.borderRight = '0.5px #FFFFFF solid';
+					this.$['right-btn'].style.borderLeft = '0.5px #FFFFFF solid';					
+				} else {
+					this.$['left-btn'].style.borderRight = null;
+					this.$['right-btn'].style.borderLeft = null;
+				}
+			},
+
+			cancelBtnTapped: function(event) {
+				this.closeAlert();
+				if(this.cancelCallback) this.cancelCallback();
+				this.clearCallback();
+			},
+
+			confirmBtnTapped: function(event) {
+				this.closeAlert();
+				if(this.confirmCallback) this.confirmCallback();
+				this.clearCallback();
+			},
+
+			closeAlert: function() {
+				var mgAlert = document.querySelector('mg-alert');
+
+				var alertBox = mgAlert.querySelector('#alert-box');
+				var modal = mgAlert.querySelector('#modal');
+
+				alertBox.style.display = 'none';
+				modal.style.display = 'none';
+
+				var wrapper = mgAlert.querySelector('.content-wrapper');
+				while(wrapper.lastChild) {
+					wrapper.removeChild(wrapper.lastChild);
+				};
+				this.useCancelButton = false;
+				this.useConfirmButton = false;				
+			},
+
+			clearCallback: function() {
+				this.cancelCallback = null;
+				this.confirmCallback = null;
+			}
 		})
 	</script>
 </dom-module>
